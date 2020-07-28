@@ -1,0 +1,36 @@
+version: "3"
+services:
+  elasticsearch:
+    container_name: elasticsearch_c_el
+    image: elasticsearch:7.8.1
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ./logs/elasticsearch:/usr/share/elasticsearch/logs
+    ports:
+      - 9200:9200
+    environment:
+      - node.name=es-single
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+  kibana:
+    container_name: kibana_c_el
+    image: kibana:7.8.1
+    links:
+      - elasticsearch
+    ports:
+      - 5601:5601
+    networks:
+      - default
+
+  logstash:
+    container_name: logstash_c_el
+    image: logstash:7.8.1
+    volumes:
+      - ./data/logstash/pipeline:/usr/share/logstash/pipeline
+    links:
+      - elasticsearch
+    # ports:
+    #   - 5601:5601
+    networks:
+      - default
